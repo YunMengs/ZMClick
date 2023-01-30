@@ -7,8 +7,19 @@ namespace ZMClick
 {
     public partial class Form1 : Form
     {
+        /// <summary>
+        /// 连点定时器
+        /// </summary>
         System.Windows.Forms.Timer timer_clicker = new System.Windows.Forms.Timer();
 
+        /// <summary>
+        /// 窗口是否已经加载完毕
+        /// </summary>
+        bool isLoaded = false;
+
+        /// <summary>
+        /// F1-F12
+        /// </summary>
         int[] KeysArray = {
             0x70,
             0x71,
@@ -40,6 +51,7 @@ namespace ZMClick
             HotKeyComboBox.SelectedIndex = Properties.Settings.Default.HotKey;
             IntervalBox.Text = Properties.Settings.Default.Interval.ToString();
             HotKey();
+            isLoaded = true;
         }
 
         /// <summary>
@@ -84,7 +96,11 @@ namespace ZMClick
         private void HotKey()
         {
             key = Win32Api.GlobalAddAtom(HotKeyComboBox.Text);
-            Win32Api.RegisterHotKey(this.Handle, key, Win32Api.KeyModifiers.None, KeysArray[Properties.Settings.Default.HotKey]);
+            bool success = Win32Api.RegisterHotKey(this.Handle, key, Win32Api.KeyModifiers.None, KeysArray[Properties.Settings.Default.HotKey]);
+            if(!success)
+            {
+                MessageBox.Show(HotKeyComboBox.Text + "已经被其他软件占用，请更换热键", "温馨提示", MessageBoxButtons.OK);
+            }
             label5.Text = "使用热键" + HotKeyComboBox.Text + "开启关闭连点";
         }
 
@@ -191,36 +207,50 @@ namespace ZMClick
 
         private void MouseComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Properties.Settings.Default.Mouse = MouseComboBox.SelectedIndex;
-            Properties.Settings.Default.Save();
+            if(isLoaded)
+            {
+                Properties.Settings.Default.Mouse = MouseComboBox.SelectedIndex;
+                Properties.Settings.Default.Save();
+            }
+            
         }
 
         private void IntervalBox_TextChanged(object sender, EventArgs e)
         {
-            int.TryParse(IntervalBox.Text, out int n);
-            if (n == 0)
+            if (isLoaded)
             {
-                n = 100;
-                IntervalBox.Text = "100";
-            }
+                int.TryParse(IntervalBox.Text, out int n);
+                if (n == 0)
+                {
+                    n = 100;
+                    IntervalBox.Text = "100";
+                }
 
-            Properties.Settings.Default.Interval = n;
-            Properties.Settings.Default.Save();
+                Properties.Settings.Default.Interval = n;
+                Properties.Settings.Default.Save();
+            }
+            
         }
 
         private void HotKeyComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Win32Api.UnregisterHotKey(this.Handle, key);
-            Properties.Settings.Default.HotKey = HotKeyComboBox.SelectedIndex;
-            Properties.Settings.Default.Save();
-            HotKey();
+            if (isLoaded)
+            {
+                Win32Api.UnregisterHotKey(this.Handle, key);
+                Properties.Settings.Default.HotKey = HotKeyComboBox.SelectedIndex;
+                Properties.Settings.Default.Save();
+                HotKey();
+            }
         }
 
         private void LongIntervalBox_TextChanged(object sender, EventArgs e)
         {
-            int.TryParse(LongIntervalBox.Text, out int n);
-            Properties.Settings.Default.LongInterval = n;
-            Properties.Settings.Default.Save();
+            if (isLoaded) 
+            { 
+                int.TryParse(LongIntervalBox.Text, out int n);
+                Properties.Settings.Default.LongInterval = n;
+                Properties.Settings.Default.Save();
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -266,7 +296,7 @@ namespace ZMClick
 
         private void 退出ToolStripMenuItem_Click_1(object sender, EventArgs e)
         {
-            if (MessageBox.Show("你确定要退出？", "系统提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
+            if (MessageBox.Show("你确定要退出织梦鼠标连点器吗？", "温馨提示", MessageBoxButtons.YesNo, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1) == DialogResult.Yes)
             {
 
                 this.mainNotifyIcon.Visible = false;
