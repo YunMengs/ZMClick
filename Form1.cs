@@ -50,6 +50,7 @@ namespace ZMClick
             MouseComboBox.SelectedIndex = Properties.Settings.Default.Mouse;
             HotKeyComboBox.SelectedIndex = Properties.Settings.Default.HotKey;
             IntervalBox.Text = Properties.Settings.Default.Interval.ToString();
+            LongIntervalBox.Text = Properties.Settings.Default.LongInterval.ToString();
             HotKey();
             isLoaded = true;
         }
