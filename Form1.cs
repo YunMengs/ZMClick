@@ -46,6 +46,18 @@ namespace ZMClick
 
         private void Form1_Load(object sender, EventArgs e)
         {
+
+            // 启动后最小化
+            if (Properties.Settings.Default.Minimize)
+            {
+                //图标显示在托盘区
+                mainNotifyIcon.Text = "织梦鼠标连点器";
+                mainNotifyIcon.Visible = true;
+                //隐藏任务栏区图标
+                this.ShowInTaskbar = false;
+                WindowState = FormWindowState.Minimized;
+            }
+
             timer_clicker.Tick += new EventHandler(ClickTick);//事件处理
             MouseComboBox.SelectedIndex = Properties.Settings.Default.Mouse;
             HotKeyComboBox.SelectedIndex = Properties.Settings.Default.HotKey;
@@ -98,7 +110,7 @@ namespace ZMClick
         {
             key = Win32Api.GlobalAddAtom(HotKeyComboBox.Text);
             bool success = Win32Api.RegisterHotKey(this.Handle, key, Win32Api.KeyModifiers.None, KeysArray[Properties.Settings.Default.HotKey]);
-            if(!success)
+            if (!success)
             {
                 MessageBox.Show(HotKeyComboBox.Text + "已经被其他软件占用，请更换热键", "温馨提示", MessageBoxButtons.OK);
             }
@@ -208,12 +220,12 @@ namespace ZMClick
 
         private void MouseComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(isLoaded)
+            if (isLoaded)
             {
                 Properties.Settings.Default.Mouse = MouseComboBox.SelectedIndex;
                 Properties.Settings.Default.Save();
             }
-            
+
         }
 
         private void IntervalBox_TextChanged(object sender, EventArgs e)
@@ -230,7 +242,7 @@ namespace ZMClick
                 Properties.Settings.Default.Interval = n;
                 Properties.Settings.Default.Save();
             }
-            
+
         }
 
         private void HotKeyComboBox_SelectedIndexChanged(object sender, EventArgs e)
@@ -246,8 +258,8 @@ namespace ZMClick
 
         private void LongIntervalBox_TextChanged(object sender, EventArgs e)
         {
-            if (isLoaded) 
-            { 
+            if (isLoaded)
+            {
                 int.TryParse(LongIntervalBox.Text, out int n);
                 Properties.Settings.Default.LongInterval = n;
                 Properties.Settings.Default.Save();
@@ -308,6 +320,15 @@ namespace ZMClick
             }
         }
 
-       
+        private void 退出ToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            退出ToolStripMenuItem_Click_1(sender, e);
+        }
+
+        private void 设置ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SetUp setUp = new SetUp();
+            setUp.Show();
+        }
     }
 }
